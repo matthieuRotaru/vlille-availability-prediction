@@ -1,0 +1,47 @@
+name: Deploy Vlille Ingestion
+
+on:
+  push:
+    branches: [main]
+    paths: ['data-ingestion/vlille/**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - name: Install test dependencies
+        run: pip install pytest psycopg2-binary
+      - name: Run tests
+        run: PYTHONPATH=data-ingestion/vlille pytest data-ingestion/vlille/tests/test_unit.py
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
+      - name: Package Lambda function
+        run: |
+          pip install psycopg2-binary -t package
+          cp -r data-ingestion/vlille/src/* package/
+          cd package
+          zip -r ../deployment.zip .
+      - name: Update Lambda function code
+        run: |
+          aws lambda update-function-code \
+            --function-name fetch_vlille_data \
+            --zip-file fileb://deployment.zip
