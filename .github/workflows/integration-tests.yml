@@ -9,19 +9,25 @@ on:
 jobs:
   integration-test:
     runs-on: ubuntu-latest
-    
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5433
+      DB_USER: testuser
+      DB_PASS: testpassword
+      DB_NAME: testdb
+
     services:
       postgres:
         image: postgres:13
         env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpassword
-          POSTGRES_DB: testdb
+          POSTGRES_USER: ${{ env.DB_USER }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASS }}
+          POSTGRES_DB: ${{ env.DB_NAME }}
         ports:
-          - 5432
+          - 5433:5432
         # The healthcheck is crucial to ensure tests don't start before the DB is ready
         options: >-
-          --health-cmd "pg_isready -U testuser -d testdb"
+          --health-cmd "pg_isready -U ${{ env.DB_USER }} -d ${{ env.DB_NAME }}"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
@@ -37,17 +43,7 @@ jobs:
       - name: Install dependencies
         run: pip install pytest psycopg2-binary
 
-      - name: Create init.sql for container
-        run: cp data-ingestion/vlille/tests/init.sql ./init.sql
-
       - name: Run Integration Tests
         run: |
           # The PYTHONPATH is needed for imports to work correctly
           PYTHONPATH=data-ingestion/vlille pytest data-ingestion/vlille/tests/test_integration.py
-        env:
-          # These env vars are used by the test script to connect to the DB service
-          DB_HOST: postgres
-          DB_PORT: 5432
-          DB_USER: testuser
-          DB_PASS: testpassword
-          DB_NAME: testdb
