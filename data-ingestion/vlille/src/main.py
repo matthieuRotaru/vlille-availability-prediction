@@ -16,6 +16,7 @@ API_URL = "https://media.ilevia.fr/opendata/station_status.json"
 
 
 
+
 def fetch_vlille_data(url):
     """
     Fetches data from the V'lille API.
