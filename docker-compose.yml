@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres_test:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: testdb
+    ports:
+      - "5433:5432" # Map container port 5432 to host port 5433 to avoid conflicts
+    volumes:
+      - ./data-ingestion/vlille/tests/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d testdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

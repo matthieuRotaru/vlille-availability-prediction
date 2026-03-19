@@ -9,6 +9,7 @@ DB_HOST = os.environ.get("DB_HOST")
 DB_NAME = os.environ.get("DB_NAME", "postgres")
 DB_USER = os.environ.get("DB_USER", "postgres")
 DB_PASS = os.environ.get("DB_PASS")
+DB_PORT = os.environ.get("DB_PORT") # Added for test environment flexibility
 
 # V'lille API Endpoint (GBFS Station Status)
 API_URL = "https://media.ilevia.fr/opendata/station_status.json"
@@ -35,8 +36,10 @@ def insert_data(data, db_config):
     """
     conn = None
     try:
-        print(f"Connecting to database at {db_config['host']}...")
-        conn = psycopg2.connect(**db_config, connect_timeout=5)
+        # Filter out None values from db_config, especially for the port
+        clean_db_config = {k: v for k, v in db_config.items() if v is not None}
+        print(f"Connecting to database at {clean_db_config.get('host')}:{clean_db_config.get('port')}...")
+        conn = psycopg2.connect(**clean_db_config, connect_timeout=5)
         cur = conn.cursor()
         insert_query = "INSERT INTO raw_vlille (raw_content) VALUES (%s);"
         cur.execute(insert_query, [Json(data)])
@@ -59,6 +62,7 @@ def lambda_handler(event, context):
             "database": DB_NAME,
             "user": DB_USER,
             "password": DB_PASS,
+            "port": DB_PORT, # Added port
         }
         insert_data(data, db_config)
 
