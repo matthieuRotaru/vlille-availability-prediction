@@ -18,7 +18,7 @@ jobs:
           POSTGRES_PASSWORD: testpassword
           POSTGRES_DB: testdb
         ports:
-          - 5433:5432
+          - 5432
         # The healthcheck is crucial to ensure tests don't start before the DB is ready
         options: >-
           --health-cmd "pg_isready -U testuser -d testdb"
@@ -46,8 +46,8 @@ jobs:
           PYTHONPATH=data-ingestion/vlille pytest data-ingestion/vlille/tests/test_integration.py
         env:
           # These env vars are used by the test script to connect to the DB service
-          DB_HOST: localhost
-          DB_PORT: 5433
+          DB_HOST: postgres
+          DB_PORT: 5432
           DB_USER: testuser
           DB_PASS: testpassword
           DB_NAME: testdb

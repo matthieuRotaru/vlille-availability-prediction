@@ -7,13 +7,13 @@ import time
 from src.main import lambda_handler
 
 # --- Database Connection Details for the Test Environment ---
-# These must match the values in docker-compose.yml
+# These are now sourced from environment variables, with defaults for local docker-compose setup
 DB_CONFIG = {
-    "host": "localhost",
-    "port": "5433",
-    "user": "testuser",
-    "password": "testpassword",
-    "database": "testdb",
+    "host": os.environ.get("DB_HOST", "localhost"),
+    "port": os.environ.get("DB_PORT", "5433"),
+    "user": os.environ.get("DB_USER", "testuser"),
+    "password": os.environ.get("DB_PASS", "testpassword"),
+    "database": os.environ.get("DB_NAME", "testdb"),
 }
 
 @pytest.fixture(scope="module")
