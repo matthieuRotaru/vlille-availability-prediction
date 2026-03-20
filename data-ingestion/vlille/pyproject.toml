@@ -1,0 +1,7 @@
+[tool.pytest.ini_options]
+# Ajoute le dossier courant au chemin de recherche pour trouver 'src'
+pythonpath = ["."]
+# Dit à pytest où chercher les tests
+testpaths = ["tests"]
+# Optionnel : affiche les print() même si le test réussit
+addopts = "-s"
