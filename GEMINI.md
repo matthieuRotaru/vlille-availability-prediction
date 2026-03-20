@@ -19,7 +19,7 @@ The project follows a Monorepo structure to ensure service consistency and strea
 
 The `data-ingestion/vlille` lambda follows a structured layout for testability and maintainability:
 - `/src`: Contains the main application logic (`main.py`).
-- `/tests`: Contains unit tests for the lambda (`test_main.py`).
+- `/tests`: Contains unit tests for the lambda (`test_unit.py`). all the tests will be done with pytest
 
 The CI/CD is managed by two GitHub Actions workflows:
 1.  **Test on Pull Request (`test-vlille-lambda.yml`)**: Automatically runs `pytest` for any PR that modifies the `data-ingestion/vlille/` directory. This ensures that new code is tested before being merged.
